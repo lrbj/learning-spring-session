@@ -1,5 +1,6 @@
 package com.example.springsessiondemo.controller;
 
+import org.springframework.boot.web.servlet.server.Session;
 import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -7,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
@@ -43,5 +45,31 @@ public class CookieController
         }
 
         return  "index";
+    }
+
+    @RequestMapping("/set")
+    String set(HttpServletRequest req) {
+        req.getSession().setAttribute("testKey", "testValue");
+        System.out.println ("setSession");
+        Cookie[] cookies = req.getCookies ();
+        if (cookies != null && cookies.length > 0){
+            for (Cookie cookie: cookies){
+                System.out.println (cookie.getName ()+":"+cookie.getValue ());
+            }
+        }
+        return "set session:testKey=testValue";
+    }
+
+    @RequestMapping("/query")
+    String query(HttpServletRequest req) {
+        Object value = req.getSession().getAttribute("testKey");
+        System.out.println ("query session");
+        Cookie[] cookies = req.getCookies ();
+        if (cookies != null && cookies.length > 0){
+            for (Cookie cookie: cookies){
+                System.out.println (cookie.getName ()+":"+cookie.getValue ());
+            }
+        }
+        return "query Session：\"testKey\"=" + value;
     }
 }
