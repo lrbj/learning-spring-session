@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
+import org.springframework.session.web.http.CookieSerializer;
 import org.springframework.session.web.http.DefaultCookieSerializer;
 
 import static org.springframework.session.data.redis.RedisFlushMode.IMMEDIATE;
@@ -16,9 +17,8 @@ import static org.springframework.session.data.redis.RedisFlushMode.ON_SAVE;
  * @Description:
  * @Date:Created in 4:01 PM 8/31/2018
  */
-@Configuration
-@EnableRedisHttpSession
-public class HttpSessionConfig {
+@EnableRedisHttpSession(maxInactiveIntervalInSeconds = 300)//session过期时间
+public class SessionConfig {
     @Value ("${spring.redis.host}")
     private String hostname;
 
@@ -37,5 +37,13 @@ public class HttpSessionConfig {
         return lettuceConnectionFactory;
     }
 
+    @Bean
+    public CookieSerializer cookieSerializer() {
+        DefaultCookieSerializer serializer = new DefaultCookieSerializer();
+        serializer.setCookieName("JSESSIONID"); // <1>
+        serializer.setCookiePath("/"); // <2>
+        serializer.setDomainNamePattern("^.+?\\.(\\w+\\.[a-z]+)$"); // <3>
+        return serializer;
+    }
 
 }

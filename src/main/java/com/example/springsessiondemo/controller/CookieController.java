@@ -12,6 +12,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -89,6 +90,9 @@ public class CookieController
         if (cookies != null && cookies.length > 0){
             for (Cookie cookie: cookies){
                 System.out.println (cookie.getName ()+":"+cookie.getValue ());
+                byte[] decodedCookieBytes = Base64.getDecoder().decode(cookie.getValue ());
+                String  decodeSeesionId = new String(decodedCookieBytes);
+                System.out.println (cookie.getName ()+"："+  decodeSeesionId);
             }
         }
 
