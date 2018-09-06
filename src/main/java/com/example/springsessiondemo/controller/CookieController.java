@@ -1,6 +1,8 @@
 package com.example.springsessiondemo.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.server.Session;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -10,6 +12,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Author: Kayla,Ye
@@ -19,6 +23,10 @@ import javax.servlet.http.HttpSession;
 @RestController
 public class CookieController
 {
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
     @RequestMapping("/test/cookie")
     public  String cookie(@RequestParam("browser") String  browser,HttpServletRequest request,HttpSession session){
 
@@ -51,25 +59,39 @@ public class CookieController
     String set(HttpServletRequest req) {
         req.getSession().setAttribute("testKey", "testValue");
         System.out.println ("setSession");
+        String sessionId =   req.getSession().getId ();
+        System.out.println ("sessionId="+ sessionId);
         Cookie[] cookies = req.getCookies ();
         if (cookies != null && cookies.length > 0){
             for (Cookie cookie: cookies){
                 System.out.println (cookie.getName ()+":"+cookie.getValue ());
             }
         }
+
+        String token = UUID.randomUUID ().toString ();
+        Integer expire = 1;
+        stringRedisTemplate.opsForValue ().set (String.format ("token",token ),
+                "123",
+                expire,
+                TimeUnit.SECONDS);
+
         return "set session:testKey=testValue";
     }
 
     @RequestMapping("/query")
     String query(HttpServletRequest req) {
-        Object value = req.getSession().getAttribute("testKey");
+        HttpSession session =  req.getSession();
+        Object value = session.getAttribute("testKey");
         System.out.println ("query session");
+        String sessionId = session.getId ();
+        System.out.println ("sessionId="+ sessionId);
         Cookie[] cookies = req.getCookies ();
         if (cookies != null && cookies.length > 0){
             for (Cookie cookie: cookies){
                 System.out.println (cookie.getName ()+":"+cookie.getValue ());
             }
         }
+
         return "query Session：\"testKey\"=" + value;
     }
 }
