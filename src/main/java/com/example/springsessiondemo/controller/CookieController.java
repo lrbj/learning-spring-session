@@ -22,12 +22,13 @@ import java.util.concurrent.TimeUnit;
  * @Date:Created in 2:40 PM 8/31/2018
  */
 @RestController
+@RequestMapping("/test")
 public class CookieController {
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
-    @RequestMapping("/test/cookie")
+    @RequestMapping("cookie")
     public String cookie(@RequestParam("browser") String browser, HttpServletRequest request, HttpSession session) {
 
 
